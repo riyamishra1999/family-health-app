@@ -19,9 +19,11 @@ import { useRouter } from "next/router";
 import { AuthContext } from "../../utils/AuthContext";
 import {
   createUserWithEmailAndPassword,
-  onAuthStateChanged,
+  sendEmailVerification,
+  signOut,
 } from "firebase/auth";
 import { auth } from "../../utils/firebase-config";
+import { API } from "../../utils/api";
 
 const SignUp = () => {
   const toast = useToast();
@@ -49,11 +51,29 @@ const SignUp = () => {
   const submitHandler = async (data: any) => {
     console.log(data, "data>>>");
     try {
-      await createUserWithEmailAndPassword(auth, data?.email, data?.password);
-      await onAuthStateChanged(auth, async (currentUser: any) => {
-        setUser(currentUser);
+      const users = await createUserWithEmailAndPassword(
+        auth,
+        data?.email,
+        data?.password
+      );
+      await API.post("/family/create", {
+        email: data?.email,
+        name: data?.name,
+        phone: data?.phone,
+        address: data?.address,
+        firebase_id: users?.user?.uid,
+      }).then(async (res) => {
+        console.log("sent>>>");
+        sendEmailVerification(users?.user, { url: "http://localhost:3000/" });
+        toast({
+          title: "Email Verification",
+          status: "warning",
+          description:
+            "We have sent you a verification link. Kindly check your inbox",
+        });
+        await signOut(auth);
+        router.push("/login");
       });
-      router.push("/login");
     } catch (error: any) {
       toast({
         title: `${error.message

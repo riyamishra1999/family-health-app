@@ -36,23 +36,15 @@ const Login = () => {
       await signInWithEmailAndPassword(auth, data?.email, data?.password);
       onAuthStateChanged(auth, async (currentUser: any) => {
         setUser(currentUser);
-        // if (currentUser && !currentUser?.emailVerified) {
-        //   setUser(null);
-        //   console.log("logged out>>>><<<<<>>>");
-        //   await toast({
-        //     title: "Verify Email",
-        //     status: "warning",
-        //     isClosable: true,
-        //   });
-        //   return;
-        // }
       });
+      if (user) {
+        toast({
+          title: "logged in successfully",
+          status: "success",
+          isClosable: true,
+        });
+      }
       router.push("/");
-      // toast({
-      //   title: "logged in successfully",
-      //   status: "success",
-      //   isClosable: true,
-      // });
     } catch (error: any) {
       toast({
         title: `${error.message
@@ -69,7 +61,7 @@ const Login = () => {
     if (user) {
       router.push("/");
     }
-  }, [user]);
+  }, []);
   console.log(errors, "errors>>>");
   return (
     <form onSubmit={handleSubmit(loginHandler)}>
