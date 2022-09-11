@@ -31,8 +31,15 @@ const SignUp = () => {
     email: yup.string().email().required("email is required"),
     password: yup
       .string()
-      .min(8, "passwords length should be 8 or more")
+      .min(8, "minimum 8 characters")
       .required("password is required"),
+    name: yup.string().required("name is required"),
+    address: yup.string().required("address is required"),
+    phone: yup
+      .number()
+      .min(10)
+      .required("phone number is required")
+      .typeError("invalid"),
   });
   const {
     handleSubmit,
@@ -43,15 +50,10 @@ const SignUp = () => {
     console.log(data, "data>>>");
     try {
       await createUserWithEmailAndPassword(auth, data?.email, data?.password);
-      onAuthStateChanged(auth, (currentUser: any) => {
+      await onAuthStateChanged(auth, async (currentUser: any) => {
         setUser(currentUser);
       });
       router.push("/login");
-      toast({
-        title: "verify email",
-        status: "warning",
-        isClosable: true,
-      });
     } catch (error: any) {
       toast({
         title: `${error.message
@@ -86,6 +88,13 @@ const SignUp = () => {
             width={{ base: "full", sm: "md", md: "xl" }}
           >
             <InputController
+              label="Your Name"
+              type="text"
+              register={register}
+              name="name"
+              error={errors?.name?.message}
+            />
+            <InputController
               label="Email"
               type="email"
               register={register}
@@ -99,8 +108,24 @@ const SignUp = () => {
               name="password"
               error={errors?.password?.message}
             />
+
+            <InputController
+              label="Address"
+              type="text"
+              register={register}
+              name="address"
+              error={errors?.address?.message}
+            />
+            <InputController
+              label="Phone"
+              type="text"
+              register={register}
+              name="phone"
+              error={errors?.phone?.message}
+            />
+
             <Button
-              mt="6"
+              mt="8"
               type="submit"
               isLoading={isSubmitting}
               colorScheme={"green"}

@@ -19,7 +19,7 @@ const Login = () => {
   const router = useRouter();
 
   const schema = Yup.object().shape({
-    email: Yup.string().required("name is required"),
+    email: Yup.string().required("email is required"),
     password: Yup.string().required("password is required"),
   });
   const {
@@ -34,12 +34,12 @@ const Login = () => {
   const loginHandler = async (data: any) => {
     try {
       await signInWithEmailAndPassword(auth, data?.email, data?.password);
-      onAuthStateChanged(auth, (currentUser: any) => {
+      onAuthStateChanged(auth, async (currentUser: any) => {
         setUser(currentUser);
         // if (currentUser && !currentUser?.emailVerified) {
-        //   signOut(auth);
+        //   setUser(null);
         //   console.log("logged out>>>><<<<<>>>");
-        //   toast({
+        //   await toast({
         //     title: "Verify Email",
         //     status: "warning",
         //     isClosable: true,
@@ -48,11 +48,11 @@ const Login = () => {
         // }
       });
       router.push("/");
-      toast({
-        title: "logged in successfully",
-        status: "success",
-        isClosable: true,
-      });
+      // toast({
+      //   title: "logged in successfully",
+      //   status: "success",
+      //   isClosable: true,
+      // });
     } catch (error: any) {
       toast({
         title: `${error.message
@@ -100,7 +100,12 @@ const Login = () => {
                 type="password"
                 error={errors?.password?.message}
               />
-              <Button type="submit" colorScheme={"green"} mt={10}>
+              <Button
+                type="submit"
+                colorScheme={"green"}
+                mt={10}
+                isLoading={isSubmitting}
+              >
                 Login
               </Button>
               <Button
