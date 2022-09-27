@@ -76,10 +76,10 @@ const SignUp = () => {
       });
     } catch (error: any) {
       toast({
-        title: `${error.message
-          .split("/")[1]
-          .split(")")[0]
-          .replaceAll("-", " ")}`,
+        title: `${error?.message
+          ?.split("/")[1]
+          ?.split(")")[0]
+          ?.replaceAll("-", " ")}`,
         status: "error",
         position: "top-right",
         isClosable: true,
