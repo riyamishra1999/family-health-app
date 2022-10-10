@@ -37,6 +37,7 @@ const Home: NextPage = () => {
     name: yup.string().required("name is required"),
     dateOfBirth: yup.date().required("date of birth is required"),
     gender: yup.string().required("gender is required"),
+    relation: yup.string().required("your relation is required"),
   });
   const { user, setUser } = useContext(AuthContext);
   const [family, setFamily] = useState<any>();
@@ -60,6 +61,40 @@ const Home: NextPage = () => {
       value: "female",
     },
   ];
+
+  const relationOptions = [
+    {
+      option: "father",
+    },
+    {
+      option: "mother",
+    },
+    {
+      option: "husband",
+    },
+    {
+      option: "wife",
+    },
+    {
+      option: "son",
+    },
+    {
+      option: "daughter",
+    },
+    {
+      option: "brother",
+    },
+    {
+      option: "sister",
+    },
+    {
+      option: "grandfather",
+    },
+    {
+      option: "grandmother",
+    },
+  ];
+
   const createUserHandler = async (data: any) => {
     try {
       const response: any = await API.post("/user/create", {
@@ -67,6 +102,7 @@ const Home: NextPage = () => {
         name: data?.name,
         gender: data?.gender,
         dateOfBirth: data?.dateOfBirth,
+        relation: data?.relation,
       });
       if (response) {
         console.log(response);
@@ -175,6 +211,23 @@ const Home: NextPage = () => {
                     </Select>
                     <FormErrorMessage>
                       {errors?.gender?.message?.toString()}
+                    </FormErrorMessage>
+                  </FormControl>
+                  <FormControl isInvalid={!!errors?.relation?.message}>
+                    <FormLabel>Relation</FormLabel>
+
+                    <Select {...register("relation")} defaultValue="">
+                      <option disabled value="">
+                        select your relation...
+                      </option>
+                      {relationOptions.map((item, key) => (
+                        <option key={key} value={item.option}>
+                          {item.option}
+                        </option>
+                      ))}
+                    </Select>
+                    <FormErrorMessage>
+                      {errors?.relation?.message?.toString()}
                     </FormErrorMessage>
                   </FormControl>
                   <Button

@@ -1748,6 +1748,11 @@ caniuse-lite@^1.0.30001332, caniuse-lite@^1.0.30001335, caniuse-lite@^1.0.300013
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001363.tgz#26bec2d606924ba318235944e1193304ea7c4f15"
   integrity sha512-HpQhpzTGGPVMnCjIomjt+jvyUu8vNFo3TaDiZ/RcoTrlOq/5+tC8zHdsbgFB6MxmaY+jCpsH09aD80Bb4Ow3Sg==
 
+chakra-ui-file-picker@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/chakra-ui-file-picker/-/chakra-ui-file-picker-0.3.0.tgz#9335d93d62ffb92776928aa7ec3a5c2b53df606c"
+  integrity sha512-bf6KjEG135k3vWY0kmK1WLvuRsBsYa8+YEqUftpaT/tVbwHnWZUZIOIXaX7szZDmlp81FPxXeoxW0fJozs71hg==
+
 chalk@^2.0.0:
   version "2.4.2"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-2.4.2.tgz#cd42541677a54333cf541a49108c1432b44c9424"
