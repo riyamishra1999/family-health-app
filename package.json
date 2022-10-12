@@ -5,6 +5,7 @@
     "build": "next build",
     "start": "next start"
   },
+  "proxy": "https://icdaccessmanagement.who.int/connect/token",
   "dependencies": {
     "@chakra-ui/icons": "^2.0.9",
     "@chakra-ui/react": "^2.3.2",
@@ -19,6 +20,7 @@
     "react": "18.1.0",
     "react-dom": "18.1.0",
     "react-hook-form": "^7.34.2",
+    "react-icd10": "^1.0.9",
     "react-icons": "^4.4.0",
     "yup": "^0.32.11"
   },
