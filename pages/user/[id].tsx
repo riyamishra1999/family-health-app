@@ -8,8 +8,15 @@ import {
   Heading,
   HStack,
   Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
   SimpleGrid,
   Text,
+  useDisclosure,
   VStack,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
@@ -77,6 +84,7 @@ const UserPage = () => {
     }
   };
   console.log(dataICD);
+  const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <Box width={"full"} p="4">
       <HStack>
@@ -86,115 +94,7 @@ const UserPage = () => {
       <Divider my={"2"} />
       <Heading my="4">Medical Records</Heading>
       <SimpleGrid columns={2} minChildWidth={"400px"} spacing={16}>
-        <Box
-          py={"8"}
-          px={"4"}
-          width={{ base: "full", md: "450px" }}
-          boxShadow={"lg"}
-          background="green.50"
-        >
-          <Text
-            mt={"-5"}
-            fontWeight={"bold"}
-            fontSize={"xl"}
-            color={"gray.800"}
-          >
-            Diagnosis # 1
-          </Text>
-          <Divider mb={"3"} />
-          <form onSubmit={handleSubmit(SubmitHandler)}>
-            <VStack align={"stretch"} spacing="8">
-              <FormControl>
-                <FormLabel>Date of Prescription</FormLabel>
-                <InputController
-                  register={register}
-                  name="dateOfPrescription"
-                  type="date"
-                />
-              </FormControl>
-              <VStack align="stretch" spacing={"-1"}>
-                <FormLabel>Upload Prescription Image</FormLabel>
-                <Controller
-                  name="images"
-                  control={control}
-                  render={({ field }) => (
-                    <FilePicker
-                      {...field}
-                      onFileChange={(fileList: any) => {
-                        fileList?.map((file: any) =>
-                          url.push(URL.createObjectURL(file))
-                        );
-
-                        setImageUrl(url);
-                        setValue("images", fileList);
-                      }}
-                      placeholder="Select files..."
-                      clearButtonLabel="Clear"
-                      multipleFiles={true}
-                      accept="image/*"
-                      hideClearButton={false}
-                    />
-                  )}
-                />
-
-                <SimpleGrid minChildWidth={100} p="2" gap="1">
-                  {imageUrl?.length > 0 &&
-                    imageUrl?.map((item: any, key: any) => (
-                      <img
-                        key={`prescription-${key}`}
-                        src={item}
-                        height="200"
-                        width="200"
-                      />
-                    ))}
-                </SimpleGrid>
-                <VStack align={"stretch"}>
-                  <FormLabel>
-                    Select the disease you're diagnosed with:
-                  </FormLabel>
-                  <HStack>
-                    <Input
-                      size={"lg"}
-                      placeholder="search for related diseases..."
-                      type="text"
-                      value={searchText}
-                      onChange={(e) => setSearchText(e.target.value)}
-                    />
-                    <Button size="lg" colorScheme={"green"} onClick={queryICD}>
-                      Search
-                    </Button>
-                  </HStack>
-                  {dataICD?.length > 0 && (
-                    <VStack
-                      align={"stretch"}
-                      zIndex={2}
-                      height={"200px"}
-                      overflowY={"scroll"}
-                    >
-                      {dataICD?.map((item: any, key: any) => (
-                        <Box
-                          mt="4"
-                          key={key}
-                          dangerouslySetInnerHTML={{ __html: item?.title }}
-                        />
-                      ))}
-                    </VStack>
-                  )}
-                </VStack>
-              </VStack>
-              <Button
-                mt={4}
-                w="full"
-                colorScheme="green"
-                isLoading={isSubmitting}
-                type="submit"
-              >
-                Submit
-              </Button>
-            </VStack>
-          </form>
-        </Box>
-        {/* <Center
+        <Center
           background={"green.50"}
           border={"2px"}
           borderStyle={"dashed"}
@@ -206,9 +106,127 @@ const UserPage = () => {
             boxShadow: "lg",
             background: "green.100",
           }}
+          onClick={onOpen}
         >
           <AddIcon boxSize={"full"} color={"gray.600"} p="20" />
-        </Center> */}
+        </Center>
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Add Report Details</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody p="4" background="green.50">
+              <Box>
+                <Text
+                  fontWeight={"bold"}
+                  fontSize={"xl"}
+                  color={"gray.800"}
+                  mb="4"
+                  textAlign={"center"}
+                >
+                  Diagnosis #1
+                </Text>
+                <form onSubmit={handleSubmit(SubmitHandler)}>
+                  <VStack align={"stretch"} spacing="4">
+                    <FormControl>
+                      <FormLabel>Date of Prescription</FormLabel>
+                      <InputController
+                        register={register}
+                        name="dateOfPrescription"
+                        type="date"
+                      />
+                    </FormControl>
+                    <VStack align="stretch" spacing={"-1"}>
+                      <FormLabel>Upload Prescription Image</FormLabel>
+                      <Controller
+                        name="images"
+                        control={control}
+                        render={({ field }) => (
+                          <FilePicker
+                            {...field}
+                            onFileChange={(fileList: any) => {
+                              fileList?.map((file: any) =>
+                                url.push(URL.createObjectURL(file))
+                              );
+
+                              setImageUrl(url);
+                              setValue("images", fileList);
+                            }}
+                            placeholder="Select files..."
+                            clearButtonLabel="Clear"
+                            multipleFiles={true}
+                            accept="image/*"
+                            hideClearButton={false}
+                          />
+                        )}
+                      />
+
+                      <SimpleGrid minChildWidth={100} p="2" gap="1">
+                        {imageUrl?.length > 0 &&
+                          imageUrl?.map((item: any, key: any) => (
+                            <img
+                              key={`prescription-${key}`}
+                              src={item}
+                              height="200"
+                              width="200"
+                            />
+                          ))}
+                      </SimpleGrid>
+                      <VStack align={"stretch"}>
+                        <FormLabel mt="4">
+                          Select the disease you're diagnosed with:
+                        </FormLabel>
+                        <HStack>
+                          <Input
+                            size={"lg"}
+                            placeholder="search for related diseases..."
+                            type="text"
+                            value={searchText}
+                            onChange={(e) => setSearchText(e.target.value)}
+                          />
+                          <Button
+                            
+                            colorScheme={"green"}
+                            onClick={queryICD}
+                          >
+                            Search
+                          </Button>
+                        </HStack>
+                        {dataICD?.length > 0 && (
+                          <VStack
+                            align={"stretch"}
+                            zIndex={2}
+                            height={"200px"}
+                            overflowY={"scroll"}
+                          >
+                            {dataICD?.map((item: any, key: any) => (
+                              <Box
+                                mt="4"
+                                key={key}
+                                dangerouslySetInnerHTML={{
+                                  __html: item?.title,
+                                }}
+                              />
+                            ))}
+                          </VStack>
+                        )}
+                      </VStack>
+                    </VStack>
+                    <Button
+                      mt={4}
+                      w="full"
+                      colorScheme="green"
+                      isLoading={isSubmitting}
+                      type="submit"
+                    >
+                      Submit
+                    </Button>
+                  </VStack>
+                </form>
+              </Box>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
       </SimpleGrid>
     </Box>
   );
