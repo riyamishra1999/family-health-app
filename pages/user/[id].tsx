@@ -24,9 +24,13 @@ import React, { useEffect, useState } from "react";
 import { API } from "../../utils/api";
 import FilePicker from "chakra-ui-file-picker";
 import { Controller, useForm } from "react-hook-form";
-import { InputController } from "../../components/molecules/InputController";
+import {
+  InputController,
+  TextAreaController,
+} from "../../components/molecules/InputController";
 import { AddIcon } from "@chakra-ui/icons";
 import axios from "axios";
+import Timeline from "../../components/molecules/Timeline";
 const UserPage = () => {
   const router = useRouter();
   const id = router.query.id;
@@ -92,7 +96,6 @@ const UserPage = () => {
         <Text>{fetchUser?.relation}</Text>
       </HStack>
       <Divider my={"2"} />
-      <Heading my="4">Medical Records</Heading>
       <SimpleGrid columns={2} minChildWidth={"400px"} spacing={16}>
         <Center
           background={"green.50"}
@@ -108,7 +111,10 @@ const UserPage = () => {
           }}
           onClick={onOpen}
         >
-          <AddIcon boxSize={"full"} color={"gray.600"} p="20" />
+          <VStack>
+            <AddIcon boxSize={"40"} color={"gray.600"} />
+            <Text>Click here to add a report</Text>
+          </VStack>
         </Center>
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
@@ -132,7 +138,7 @@ const UserPage = () => {
                       <FormLabel>Date of Prescription</FormLabel>
                       <InputController
                         register={register}
-                        name="dateOfPrescription"
+                        name="date"
                         type="date"
                       />
                     </FormControl>
@@ -173,7 +179,7 @@ const UserPage = () => {
                           ))}
                       </SimpleGrid>
                       <VStack align={"stretch"}>
-                        <FormLabel mt="4">
+                        <FormLabel mt="3">
                           Select the disease you're diagnosed with:
                         </FormLabel>
                         <HStack>
@@ -184,11 +190,7 @@ const UserPage = () => {
                             value={searchText}
                             onChange={(e) => setSearchText(e.target.value)}
                           />
-                          <Button
-                            
-                            colorScheme={"green"}
-                            onClick={queryICD}
-                          >
+                          <Button colorScheme={"green"} onClick={queryICD}>
                             Search
                           </Button>
                         </HStack>
@@ -211,6 +213,24 @@ const UserPage = () => {
                           </VStack>
                         )}
                       </VStack>
+                      <VStack>
+                        <FormControl mt="4">
+                          <FormLabel>Follow up Date</FormLabel>
+                          <InputController
+                            register={register}
+                            name="followupDate"
+                            type="date"
+                          />
+                        </FormControl>
+                        <FormControl>
+                          <FormLabel>Remarks</FormLabel>
+                          <TextAreaController
+                            register={register}
+                            name="remarks"
+                            type="date"
+                          />
+                        </FormControl>
+                      </VStack>
                     </VStack>
                     <Button
                       mt={4}
@@ -228,6 +248,8 @@ const UserPage = () => {
           </ModalContent>
         </Modal>
       </SimpleGrid>
+      <Divider my="10" />
+      <Timeline />
     </Box>
   );
 };
