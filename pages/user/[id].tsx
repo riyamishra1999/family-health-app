@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Box,
   Button,
   Center,
@@ -11,6 +12,8 @@ import {
   Heading,
   HStack,
   Input,
+  LinkBox,
+  LinkOverlay,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -19,6 +22,7 @@ import {
   ModalOverlay,
   SimpleGrid,
   Spinner,
+  Stack,
   Text,
   useDisclosure,
   useToast,
@@ -36,6 +40,7 @@ import {
 } from "../../components/molecules/InputController";
 import { AddIcon } from "@chakra-ui/icons";
 import axios from "axios";
+import { BearerToken } from "../../utils/icdToken";
 const UserPage = () => {
   const router = useRouter();
   const id = router.query.id;
@@ -58,7 +63,7 @@ const UserPage = () => {
   useEffect(() => {
     FetchUser();
     FetchData();
-  }, [id]);
+  }, []);
   const toast = useToast();
   const {
     handleSubmit,
@@ -142,13 +147,6 @@ const UserPage = () => {
   const [searchText, setSearchText] = useState<string>("");
   const [dataICD, setDataICD] = useState<any>();
 
-  // const token_endpoint = "https://icdaccessmanagement.who.int/connect/token";
-  // const client_id =
-  //   "7d6cce10-14f6-43c5-808a-a7a026281d96_350c3e42-786b-4744-a563-c92632f8f8e0";
-  // const client_secret = "VrIuu8C6JKaqfBqpRct9etr4ZNunKJc/ggvmr4eeywc=";
-  // const scope = "icdapi_access";
-  // const grant_type = "client_credentials";
-
   const queryICD = async () => {
     const response: any = await axios.get(
       `https://id.who.int/icd/entity/search?q=${searchText}&useFlexisearch=false&flatResults=true&highlightingEnabled=false`,
@@ -157,8 +155,7 @@ const UserPage = () => {
           Accept: "application/json",
           "API-Version": "v2",
           "Accept-Language": "en",
-          Authorization:
-            "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjE2NjU3MTE4NDUsImV4cCI6MTY2NTcxNTQ0NSwiaXNzIjoiaHR0cHM6Ly9pY2RhY2Nlc3NtYW5hZ2VtZW50Lndoby5pbnQiLCJhdWQiOlsiaHR0cHM6Ly9pY2RhY2Nlc3NtYW5hZ2VtZW50Lndoby5pbnQvcmVzb3VyY2VzIiwiaWNkYXBpIl0sImNsaWVudF9pZCI6IjdkNmNjZTEwLTE0ZjYtNDNjNS04MDhhLWE3YTAyNjI4MWQ5Nl8zNTBjM2U0Mi03ODZiLTQ3NDQtYTU2My1jOTI2MzJmOGY4ZTAiLCJzY29wZSI6WyJpY2RhcGlfYWNjZXNzIl19.dOlg5ke82FPJllraNkz8uddKLbn_1HJFZ8Vvefe74CdH4KzGWZPyErLtGE6IyUeLAzHFwP9df2zLfa3J4VSsxv_KNiiWMRfzREtuOko8BpE7OJCE9oB13G_pnIGZXpRmQaYMZRKigjvtDMa89wcBc7FqfxfQequEP29Kl8vMlYim4t_qKuL-jXDAV_nGysI8z0Yf2a1KcLgKQg0yyBA86cfuUE3XPlijlrmxo1Q5ygvncoRAKTqJFZc-HX4v-6TyJSz6Y-DAZjigM4xo0zfzG6wgJ3l9m8zY4trJvlQlBMjnPOIZctERRGRH1T4LMD-BvXW4rHALvY3BvxkaiWynkA",
+          Authorization: BearerToken,
         },
       }
     );
@@ -169,9 +166,52 @@ const UserPage = () => {
   };
   const [showReports, setShowReports] = useState(false);
   console.log(dataICD);
-  const showReportsHandler = () => {
-    setShowReports(true);
+  const [reports, setReports] = useState<any>();
+  const [diag, setDiag] = useState<any>();
+  const [tag, setTag] = useState<any>();
+  const giveMeFoundationURL = async (tag: any): Promise<any> => {
+    return await axios.get(
+      `https://id.who.int/icd/entity/search?q=${tag}&useFlexisearch=false&flatResults=true&highlightingEnabled=false`,
+      {
+        headers: {
+          Accept: "application/json",
+          "API-Version": "v2",
+          "Accept-Language": "en",
+          Authorization: BearerToken,
+        },
+      }
+    );
   };
+  const showReportsHandler = async (id: any, e: any) => {
+    e.preventDefault();
+    setShowReports(true);
+    const diagResponse: any = await API.get(`/diagnosis/one/${id}`);
+    const resPDiag = await diagResponse?.response;
+    setDiag(resPDiag);
+    const diagTags = await resPDiag?.tags?.split(",");
+    setTag(diagTags);
+    console.log(diagTags, "opp");
+    const response: any = await API.get(`/report/get/${id}`);
+    setReports(await response?.response);
+    if (diagTags?.length > 0) {
+      const finalResp = Promise.all(
+        diagTags?.map(async (item: string) => {
+          const myURL = await giveMeFoundationURL(item);
+          const responseId: string = await myURL?.data?.destinationEntities[0]
+            ?.id;
+          console.log(responseId, "poapsdkpaodjpi");
+          return {
+            name: item,
+            url: "https://icd.who.int/dev11/f/en#/" + responseId,
+          };
+        })
+      );
+
+      const resp = await finalResp;
+      setTag(resp);
+    }
+  };
+  console.log(tag, "diagResponse");
 
   return (
     <>
@@ -181,12 +221,15 @@ const UserPage = () => {
         </Flex>
       ) : (
         <Box width={"full"} p="4">
-          <HStack>
-            <Heading color={"gray.800"}>{fetchUser?.name}</Heading>
-            <Text fontFamily={"mono"} px={2}>
-              {fetchUser?.relation}
-            </Text>
-          </HStack>
+          <Flex justify={"space-between"}>
+            <HStack>
+              <Heading color={"gray.800"}>{fetchUser?.name}</Heading>
+              <Text fontFamily={"mono"} px={2}>
+                {fetchUser?.relation}
+              </Text>
+            </HStack>
+            <Avatar src={fetchUser?.image} size="2xl" name={fetchUser?.name} />
+          </Flex>
           <Divider my={"2"} />
           <SimpleGrid columns={2} minChildWidth={"400px"} spacing={16} mt="4">
             <Center
@@ -393,7 +436,7 @@ const UserPage = () => {
                       bottom={"3"}
                       width={"350px"}
                       alignSelf={"center"}
-                      onClick={() => showReportsHandler()}
+                      onClick={(e) => showReportsHandler(item?.diagnosisId, e)}
                     >
                       Click to see more
                     </Button>
@@ -409,9 +452,60 @@ const UserPage = () => {
             >
               <ModalOverlay />
               <ModalContent>
-                <ModalHeader>Report of {fetchUser?.name} on</ModalHeader>
+                <ModalHeader fontWeight={"bold"}>
+                  Report of {fetchUser?.name} on {diag?.date}
+                </ModalHeader>
                 <ModalCloseButton />
-                <ModalBody></ModalBody>
+                <ModalBody px="4" py="2">
+                  {reports?.length > 0 &&
+                    reports?.map((item: any, key: any) => (
+                      <Box py="2">
+                        <img
+                          src={item?.reportURL}
+                          key={key}
+                          alt={`report-${key}`}
+                        />
+                      </Box>
+                    ))}
+                  <HStack>
+                    <Text fontWeight={"semibold"}>Diagnosed with:</Text>
+                    <Stack direction={["column", "row"]} spacing="24px">
+                      {tag?.length > 0 &&
+                        tag?.map((item: any, key: any) => (
+                          <LinkBox
+                            as="article"
+                            maxW="sm"
+                            p="2"
+                            borderWidth="1px"
+                            rounded="md"
+                            _hover={{
+                              boxShadow: "sm",
+                              textDecoration: "underline",
+                            }}
+                          >
+                            <Heading size="sm" my="2">
+                              <LinkOverlay href={item?.url} target={"_blank"}>
+                                {item?.name}
+                              </LinkOverlay>
+                            </Heading>
+                          </LinkBox>
+                        ))}
+                    </Stack>
+                  </HStack>
+                  <HStack py="2">
+                    <Text fontWeight={"semibold"}>Follow up Date:</Text>
+                    <Text>{diag?.followupDate}</Text>
+                  </HStack>
+                  <HStack py="2">
+                    <Text fontWeight={"semibold"}>Remarks:</Text>
+                    <Text>{diag?.remarks}</Text>
+                  </HStack>
+                  <Flex justify={"flex-end"}>
+                    <Button colorScheme={"blue"} justifySelf={"end"}>
+                      Download Report
+                    </Button>
+                  </Flex>
+                </ModalBody>
               </ModalContent>
             </Modal>
           </Box>

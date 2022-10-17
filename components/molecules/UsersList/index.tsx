@@ -19,8 +19,9 @@ const UsersList = ({ users }: usersListProps) => {
             <UserCard
               key={key}
               name={user?.name}
-              photo={user?.photo}
+              photo={user?.image}
               id={user?.userId}
+              relation={user?.relation}
             />
           ))}
       </SimpleGrid>

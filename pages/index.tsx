@@ -1,13 +1,16 @@
 import { AddIcon } from "@chakra-ui/icons";
 import {
+  Avatar,
   Box,
   Button,
+  Center,
   Divider,
   Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
   Heading,
+  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -23,7 +26,7 @@ import {
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { InputController } from "../components/molecules/InputController";
 import { AuthContext } from "../utils/AuthContext";
 
@@ -38,16 +41,21 @@ const Home: NextPage = () => {
     dateOfBirth: yup.date().required("date of birth is required"),
     gender: yup.string().required("gender is required"),
     relation: yup.string().required("your relation is required"),
+    image: yup.mixed(),
   });
   const { user, setUser } = useContext(AuthContext);
   const [family, setFamily] = useState<any>();
   const toast = useToast();
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
   const router = useRouter();
+  const [imageUrl, setImageUrl] = useState<any>();
+  const [fileObj, setFileObj] = useState<any>();
   const {
     handleSubmit,
     register,
     reset,
+    control,
+
     formState: { errors, isSubmitting },
   } = useForm({ mode: "all", resolver: yupResolver(validationSchema) });
 
@@ -97,13 +105,15 @@ const Home: NextPage = () => {
 
   const createUserHandler = async (data: any) => {
     try {
-      const response: any = await API.post("/user/create", {
-        familyFirebaseId: user?.uid,
-        name: data?.name,
-        gender: data?.gender,
-        dateOfBirth: data?.dateOfBirth,
-        relation: data?.relation,
-      });
+      var formData = new FormData();
+      formData.append("familyFirebaseId", user?.uid);
+      formData.append("name", data?.name);
+      formData.append("gender", data?.gender);
+      formData.append("relation", data?.relation);
+      formData.append("dateOfBirth", data?.dateOfBirth);
+      formData?.append("image", fileObj);
+
+      const response: any = await API.post("/user/create", formData);
       if (response) {
         console.log(response);
         toast({
@@ -134,6 +144,20 @@ const Home: NextPage = () => {
     fetchFamilyInformation();
   }, []);
   console.log(family, "family");
+  const handleOnChange = async (e: any) => {
+    const url: any = URL.createObjectURL(e.target.files[0]);
+    setImageUrl(url);
+
+    setFileObj(e.target.files[0]);
+  };
+  const openHandler = () => {
+    onToggle();
+    setImageUrl(null);
+    reset({
+      keepValues: false,
+    });
+  };
+  console.log(errors, "errors>>><>");
   return (
     <Box>
       <Flex
@@ -154,7 +178,7 @@ const Home: NextPage = () => {
           Welcome {family?.name},
         </Heading>
         <Button
-          onClick={onOpen}
+          onClick={() => openHandler()}
           shadow={"md"}
           colorScheme={"green"}
           size="lg"
@@ -182,7 +206,29 @@ const Home: NextPage = () => {
           <ModalBody>
             <Box px="2" py="4" color="gray.800">
               <form onSubmit={handleSubmit(createUserHandler)}>
-                <VStack gap={"10px"}>
+                <VStack gap={"10px"} align={"stretch"}>
+                  <Box>
+                    {imageUrl && (
+                      <Center rounded={"full"}>
+                        <Avatar src={imageUrl} size={"2xl"} />
+                      </Center>
+                    )}
+
+                    <Controller
+                      name="image"
+                      control={control}
+                      render={({ field }) => (
+                        <FormControl>
+                          <FormLabel>Upload Image</FormLabel>
+                          <Input
+                            {...field}
+                            type="file"
+                            onChange={handleOnChange}
+                          />
+                        </FormControl>
+                      )}
+                    />
+                  </Box>
                   <InputController
                     name="name"
                     register={register}
