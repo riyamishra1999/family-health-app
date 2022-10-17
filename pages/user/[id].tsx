@@ -221,19 +221,21 @@ const UserPage = () => {
         </Flex>
       ) : (
         <Box width={"full"} p="4">
-          <Flex justify={"space-between"}>
+          <Flex justify={"space-between"} align={"center"}>
             <HStack>
               <Heading color={"gray.800"}>{fetchUser?.name}</Heading>
               <Text fontFamily={"mono"} px={2}>
                 {fetchUser?.relation}
               </Text>
             </HStack>
-            <Avatar src={fetchUser?.image} size="2xl" name={fetchUser?.name} />
+            <Avatar src={fetchUser?.image} size="xl" name={fetchUser?.name} />
           </Flex>
           <Divider my={"2"} />
           <SimpleGrid columns={2} minChildWidth={"400px"} spacing={16} mt="4">
             <Center
-              background={"green.50"}
+              mx={"4"}
+              rounded={"md"}
+              background={"blue.50"}
               border={"2px"}
               borderStyle={"dashed"}
               borderColor={"gray.500"}
@@ -242,7 +244,8 @@ const UserPage = () => {
               cursor="pointer"
               _hover={{
                 boxShadow: "xl",
-                background: "green.100",
+                background: "blue.100",
+                transitionDuration: "500ms",
               }}
               onClick={openHandler}
             >
@@ -251,12 +254,12 @@ const UserPage = () => {
                 <Text>Click here to add a report</Text>
               </VStack>
             </Center>
-            <Modal isOpen={isOpen} onClose={onClose} size={"xl"}>
+            <Modal isOpen={isOpen} onClose={onClose} size={"2xl"}>
               <ModalOverlay />
               <ModalContent>
                 <ModalHeader>Add Report Details</ModalHeader>
                 <ModalCloseButton />
-                <ModalBody p="4" background="green.50">
+                <ModalBody p="4" background="gray.50">
                   <Box>
                     <Text
                       fontWeight={"bold"}
@@ -325,7 +328,10 @@ const UserPage = () => {
                                 value={searchText}
                                 onChange={(e) => setSearchText(e.target.value)}
                               />
-                              <Button colorScheme={"green"} onClick={queryICD}>
+                              <Button
+                                colorScheme={"twitter"}
+                                onClick={queryICD}
+                              >
                                 Search
                               </Button>
                             </HStack>
@@ -380,7 +386,7 @@ const UserPage = () => {
                         <Button
                           mt={4}
                           w="full"
-                          colorScheme="green"
+                          colorScheme="twitter"
                           isLoading={isSubmitting}
                           type="submit"
                         >
@@ -395,9 +401,10 @@ const UserPage = () => {
           </SimpleGrid>
           <Divider my="10" />
           <Box>
-            <Heading mb="4" textDecoration={"underline"}>
+            <Heading mb="4" color={"gray.800"}>
               Report Timeline
             </Heading>
+            <Divider />
             <SimpleGrid
               columns={[1, null, 3]}
               minChildWidth={"400px"}
@@ -409,20 +416,24 @@ const UserPage = () => {
                   key={`diag-${key}`}
                   width="450px"
                   height="300px"
-                  background={"green.50"}
+                  background={"blue.50"}
                   borderWidth={"2px"}
-                  borderColor={"green.100"}
+                  borderColor={"blue.100"}
                   rounded={"md"}
                   boxShadow={"md"}
                   position={"relative"}
                 >
-                  <VStack align="stretch" p="2" spacing="6">
-                    <Heading color={"gray.800"} fontSize={"2xl"}>
+                  <VStack align="stretch" p="2" spacing="4">
+                    <Heading color={"gray.600"} fontSize={"2xl"} pl={"4"}>
                       {item?.date}
                     </Heading>
                     <Divider />
                     <VStack>
-                      <Text fontSize={"lg"} fontWeight="semibold">
+                      <Text
+                        fontSize={"lg"}
+                        fontWeight="semibold"
+                        color={"gray.600"}
+                      >
                         Diagnosed with:
                       </Text>
                       <Text fontFamily={"mono"} p="4">
@@ -431,7 +442,7 @@ const UserPage = () => {
                     </VStack>
                     <Divider />
                     <Button
-                      colorScheme={"green"}
+                      colorScheme={"twitter"}
                       position={"absolute"}
                       bottom={"3"}
                       width={"350px"}
@@ -449,6 +460,7 @@ const UserPage = () => {
               motionPreset="slideInBottom"
               isOpen={showReports}
               onClose={() => setShowReports(false)}
+              scrollBehavior={"inside"}
             >
               <ModalOverlay />
               <ModalContent>

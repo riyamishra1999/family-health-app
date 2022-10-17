@@ -2,14 +2,7 @@ import { Flex } from "@chakra-ui/react";
 
 import React from "react";
 import { IconType } from "react-icons";
-import {
-  FiHome,
-  FiTrendingUp,
-  FiCompass,
-  FiStar,
-  FiSettings,
-  FiMenu,
-} from "react-icons/fi";
+import { FiHome } from "react-icons/fi";
 import NavItem from "../NavItem";
 interface LinkItemProps {
   name: string;
@@ -26,7 +19,7 @@ const Sidebar = () => {
   return (
     <Flex
       width={"full"}
-      bg={"green.50"}
+      bg={"blue.50"}
       shadow={"sm"}
       // height={"88vh"}
       // minHeight={"100%"}
@@ -48,7 +41,7 @@ const Sidebar = () => {
             icon={link.icon}
             link={link.link}
             fontWeight="semibold"
-            color="green.500"
+            color="blue.500"
           >
             {link.name}
           </NavItem>

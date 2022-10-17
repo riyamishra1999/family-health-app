@@ -93,12 +93,16 @@ const SignUp = () => {
           <IconButton
             colorScheme={"gray"}
             rounded="full"
-            color="green"
+            color="blue.500"
             aria-label="back"
             icon={<ArrowLeftIcon />}
             onClick={() => router.push("/login")}
+            _hover={{
+              color: "white",
+              background: "blue.500",
+            }}
           />
-          <Heading textAlign={"center"} color={"green"}>
+          <Heading textAlign={"center"} color={"blue.500"}>
             Sign Up for Family Health App
           </Heading>
         </Flex>
@@ -148,7 +152,7 @@ const SignUp = () => {
               mt="8"
               type="submit"
               isLoading={isSubmitting}
-              colorScheme={"green"}
+              colorScheme={"twitter"}
             >
               Signup
             </Button>

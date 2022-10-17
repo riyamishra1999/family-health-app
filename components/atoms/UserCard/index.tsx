@@ -14,7 +14,7 @@ const UserCard = ({ name, photo, id, relation }: UserCardProps) => {
   const router = useRouter();
   return (
     <HStack
-      bg={"green.100"}
+      bg={"blue.50"}
       height="100"
       justify={"center"}
       gap="8"

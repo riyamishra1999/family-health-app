@@ -180,7 +180,7 @@ const Home: NextPage = () => {
         <Button
           onClick={() => openHandler()}
           shadow={"md"}
-          colorScheme={"green"}
+          colorScheme={"twitter"}
           size="lg"
           height={"80px"}
           p="10"
@@ -194,7 +194,7 @@ const Home: NextPage = () => {
       </Flex>
       <Modal
         size={{ md: "xl" }}
-        colorScheme={"green"}
+        colorScheme={"blue"}
         onClose={onClose}
         isOpen={isOpen}
         motionPreset="slideInBottom"
