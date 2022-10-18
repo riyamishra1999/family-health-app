@@ -202,7 +202,7 @@ const Home: NextPage = () => {
           </Heading>
           <VStack align={"stretch"} color="gray.700">
             <HStack>
-              <Text fontWeight={"semibold"}>email:</Text>
+              <Text fontWeight={"semibold"}>Email:</Text>
               <Text>{family?.email}</Text>
             </HStack>
             <HStack>

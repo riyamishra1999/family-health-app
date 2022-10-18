@@ -462,7 +462,6 @@ const UserPage = () => {
               motionPreset="slideInBottom"
               isOpen={showReports}
               onClose={() => setShowReports(false)}
-              scrollBehavior={"inside"}
             >
               <ModalOverlay />
               <ModalContent>
