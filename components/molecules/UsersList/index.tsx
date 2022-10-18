@@ -9,7 +9,7 @@ interface usersListProps {
 const UsersList = ({ users }: usersListProps) => {
   console.log(users, "uselisr");
   return (
-    <Box w="full">
+    <Box w={{ base: "full", md: "md" }}>
       <Heading color="gray.800" mb="10">
         Your Family Members
       </Heading>

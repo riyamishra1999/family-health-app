@@ -10,7 +10,9 @@ import {
   FormErrorMessage,
   FormLabel,
   Heading,
+  HStack,
   Input,
+  MenuDivider,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -18,6 +20,7 @@ import {
   ModalHeader,
   ModalOverlay,
   Select,
+  Tag,
   Text,
   useDisclosure,
   useToast,
@@ -72,6 +75,9 @@ const Home: NextPage = () => {
 
   const relationOptions = [
     {
+      option: "self",
+    },
+    {
       option: "father",
     },
     {
@@ -100,6 +106,12 @@ const Home: NextPage = () => {
     },
     {
       option: "grandmother",
+    },
+    {
+      option: "grandson",
+    },
+    {
+      option: "granddaughter",
     },
   ];
 
@@ -165,8 +177,8 @@ const Home: NextPage = () => {
         align="start"
         justify={"center"}
         direction={"column"}
-        gap="10"
-        mt="4"
+        gap="8"
+        my="4"
         px="2"
       >
         <Heading
@@ -177,6 +189,43 @@ const Home: NextPage = () => {
         >
           Welcome {family?.name},
         </Heading>
+        <Box
+          background={"blue.50"}
+          py="6"
+          px="4"
+          width={{ base: "full", md: "md" }}
+          rounded="lg"
+          boxShadow={"sm"}
+        >
+          <Heading size={"lg"} mb="4">
+            Family Details
+          </Heading>
+          <VStack align={"stretch"} color="gray.700">
+            <HStack>
+              <Text fontWeight={"semibold"}>email:</Text>
+              <Text>{family?.email}</Text>
+            </HStack>
+            <HStack>
+              <Text fontWeight={"semibold"}>Address:</Text>
+              <Text>{family?.address}</Text>
+            </HStack>
+            <HStack>
+              <Text fontWeight={"semibold"}>House Number:</Text>
+              <Text>{family?.houseNumber}</Text>
+            </HStack>
+            <HStack>
+              <Text fontWeight={"semibold"}>Phone Number:</Text>
+              <Text>{family?.phone}</Text>
+            </HStack>
+            <Divider />
+            <HStack>
+              <Text fontWeight={"semibold"}>Total family members:</Text>
+              <Tag colorScheme={"twitter"} rounded={"full"}>
+                {family?.users?.length}
+              </Tag>
+            </HStack>
+          </VStack>
+        </Box>
         <Button
           onClick={() => openHandler()}
           shadow={"md"}
@@ -201,7 +250,7 @@ const Home: NextPage = () => {
       >
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader color="green.500">Add family member</ModalHeader>
+          <ModalHeader color="blue.500">Add family member</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Box px="2" py="4" color="gray.800">
@@ -280,7 +329,7 @@ const Home: NextPage = () => {
                     isLoading={isSubmitting}
                     width={"full"}
                     leftIcon={<AddIcon />}
-                    colorScheme="green"
+                    colorScheme="twitter"
                     type="submit"
                   >
                     Add

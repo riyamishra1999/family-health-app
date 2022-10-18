@@ -18,6 +18,7 @@ import {
   ModalBody,
   ModalCloseButton,
   ModalContent,
+  ModalFooter,
   ModalHeader,
   ModalOverlay,
   SimpleGrid,
@@ -41,6 +42,7 @@ import {
 import { AddIcon } from "@chakra-ui/icons";
 import axios from "axios";
 import { BearerToken } from "../../utils/icdToken";
+import { FiMessageSquare, FiShare } from "react-icons/fi";
 const UserPage = () => {
   const router = useRouter();
   const id = router.query.id;
@@ -221,7 +223,7 @@ const UserPage = () => {
         </Flex>
       ) : (
         <Box width={"full"} p="4">
-          <Flex justify={"space-between"} align={"center"}>
+          <Flex justify={"space-between"} align={"center"} w={"full"}>
             <HStack>
               <Heading color={"gray.800"}>{fetchUser?.name}</Heading>
               <Text fontFamily={"mono"} px={2}>
@@ -240,7 +242,7 @@ const UserPage = () => {
               borderStyle={"dashed"}
               borderColor={"gray.500"}
               height={"200px"}
-              width={{ base: "full", md: "220px" }}
+              width={{ base: "full", md: "200px" }}
               cursor="pointer"
               _hover={{
                 boxShadow: "xl",
@@ -414,7 +416,7 @@ const UserPage = () => {
               {diagnosis?.map((item: any, key: any) => (
                 <Box
                   key={`diag-${key}`}
-                  width="450px"
+                  width={{ base: "full", md: "450px" }}
                   height="300px"
                   background={"blue.50"}
                   borderWidth={"2px"}
@@ -512,12 +514,17 @@ const UserPage = () => {
                     <Text fontWeight={"semibold"}>Remarks:</Text>
                     <Text>{diag?.remarks}</Text>
                   </HStack>
-                  <Flex justify={"flex-end"}>
+                </ModalBody>
+                <ModalFooter>
+                  <Flex justify={"flex-end"} gap={"2"}>
+                    <Button colorScheme={"gray"} leftIcon={<FiMessageSquare />}>
+                      Send to mail
+                    </Button>
                     <Button colorScheme={"blue"} justifySelf={"end"}>
                       Download Report
                     </Button>
                   </Flex>
-                </ModalBody>
+                </ModalFooter>
               </ModalContent>
             </Modal>
           </Box>

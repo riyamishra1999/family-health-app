@@ -3,6 +3,7 @@ import {
   Button,
   Center,
   Flex,
+  FormHelperText,
   Heading,
   IconButton,
   useToast,
@@ -35,13 +36,18 @@ const SignUp = () => {
       .string()
       .min(8, "minimum 8 characters")
       .required("password is required"),
+    passwordConfirmation: yup
+      .string()
+      .oneOf([yup.ref("password"), null], "password doesn't match"),
     name: yup.string().required("name is required"),
     address: yup.string().required("address is required"),
     phone: yup
-      .number()
-      .min(10)
-      .required("phone number is required")
-      .typeError("invalid"),
+      .string()
+      .required()
+      .matches(/^[0-9]+$/, "Must be only digits")
+      .min(10, "Must be exactly 10 digits")
+      .max(10, "Must be exactly 10 digits"),
+    houseNumber: yup.number().typeError("invalid"),
   });
   const {
     handleSubmit,
@@ -62,6 +68,7 @@ const SignUp = () => {
         phone: data?.phone,
         address: data?.address,
         firebase_id: users?.user?.uid,
+        houseNumber: data?.houseNumber,
       }).then(async (res) => {
         console.log("sent>>>");
         sendEmailVerification(users?.user, { url: "http://localhost:3000/" });
@@ -132,13 +139,26 @@ const SignUp = () => {
               name="password"
               error={errors?.password?.message}
             />
-
+            <InputController
+              label="Re-enter Password"
+              type="password"
+              register={register}
+              name="passwordConfirmation"
+              error={errors?.passwordConfirmation?.message}
+            />
             <InputController
               label="Address"
               type="text"
               register={register}
               name="address"
               error={errors?.address?.message}
+            />
+            <InputController
+              label="House Number"
+              type="number"
+              register={register}
+              name="houseNumber"
+              error={errors?.houseNumber?.message}
             />
             <InputController
               label="Phone"
