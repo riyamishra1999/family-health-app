@@ -65,13 +65,17 @@ const Login = () => {
   console.log(errors, "errors>>>");
   return (
     <form onSubmit={handleSubmit(loginHandler)}>
-      <Box w="full" px={10}>
-        <Heading textAlign={"center"} mb="10" mt="2" color={"green"}>
-          Welcome to Family Health App
-        </Heading>
-        <Box boxShadow={"md"} py="4" px="2" rounded="md">
-          <Heading textAlign={"center"} color="gray" size={"2xl"}>
-            Login
+      <Box w="full" px={10} mt={"6"}>
+        <Box boxShadow={"md"} py="4" px="2" rounded="md" background="gray.50">
+          <Heading
+            textAlign={"center"}
+            color="blue.500"
+            textShadow={"xl"}
+            size={"xl"}
+            // fontFamily={"mono"}
+            mb={"8"}
+          >
+            Family Health App Login
           </Heading>
           <Center>
             <Flex
@@ -94,7 +98,7 @@ const Login = () => {
               />
               <Button
                 type="submit"
-                colorScheme={"green"}
+                colorScheme={"twitter"}
                 mt={10}
                 isLoading={isSubmitting}
               >

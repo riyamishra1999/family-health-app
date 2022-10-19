@@ -62,7 +62,7 @@ const Header = () => {
   console.log(fetchUser, "fetcheduser >>>>>>>>>>>>>...");
   return (
     <Flex
-      bg={"green.50"}
+      bg={"blue.50"}
       height={"12vh"}
       w={"full"}
       borderLeft={"2px"}
@@ -77,14 +77,18 @@ const Header = () => {
         <IconButton
           aria-label="show menu"
           icon={<HamburgerIcon />}
-          colorScheme="green"
+          colorScheme="twitter"
           onClick={onOpen}
         />
         <Drawer placement={"left"} onClose={onClose} isOpen={isOpen}>
           <DrawerOverlay />
           <DrawerContent>
             <DrawerCloseButton />
-            <DrawerHeader borderBottomWidth="1px">
+            <DrawerHeader
+              borderBottomWidth="1px"
+              color={"blue.500"}
+              fontWeight={"bold"}
+            >
               Family Health App
             </DrawerHeader>
             <DrawerBody>
@@ -100,7 +104,7 @@ const Header = () => {
           fontSize={{ base: "xl", md: "3xl" }}
           textAlign={{ base: "start", md: "center" }}
           lineHeight={1.6}
-          color={"green.500"}
+          color={"blue.500"}
           cursor="pointer"
           onClick={() => router.push("/")}
         >
@@ -117,7 +121,7 @@ const Header = () => {
           mr="2"
           aria-label="logout"
           icon={<FiLogOut />}
-          colorScheme={"green"}
+          colorScheme={"red"}
           _hover={{
             bg: "red.500",
           }}

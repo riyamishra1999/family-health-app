@@ -1,13 +1,18 @@
 import { AddIcon } from "@chakra-ui/icons";
 import {
+  Avatar,
   Box,
   Button,
+  Center,
   Divider,
   Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
   Heading,
+  HStack,
+  Input,
+  MenuDivider,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -15,6 +20,7 @@ import {
   ModalHeader,
   ModalOverlay,
   Select,
+  Tag,
   Text,
   useDisclosure,
   useToast,
@@ -23,7 +29,7 @@ import {
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { InputController } from "../components/molecules/InputController";
 import { AuthContext } from "../utils/AuthContext";
 
@@ -37,16 +43,22 @@ const Home: NextPage = () => {
     name: yup.string().required("name is required"),
     dateOfBirth: yup.date().required("date of birth is required"),
     gender: yup.string().required("gender is required"),
+    relation: yup.string().required("your relation is required"),
+    image: yup.mixed(),
   });
   const { user, setUser } = useContext(AuthContext);
   const [family, setFamily] = useState<any>();
   const toast = useToast();
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
   const router = useRouter();
+  const [imageUrl, setImageUrl] = useState<any>();
+  const [fileObj, setFileObj] = useState<any>();
   const {
     handleSubmit,
     register,
     reset,
+    control,
+
     formState: { errors, isSubmitting },
   } = useForm({ mode: "all", resolver: yupResolver(validationSchema) });
 
@@ -60,14 +72,60 @@ const Home: NextPage = () => {
       value: "female",
     },
   ];
+
+  const relationOptions = [
+    {
+      option: "self",
+    },
+    {
+      option: "father",
+    },
+    {
+      option: "mother",
+    },
+    {
+      option: "husband",
+    },
+    {
+      option: "wife",
+    },
+    {
+      option: "son",
+    },
+    {
+      option: "daughter",
+    },
+    {
+      option: "brother",
+    },
+    {
+      option: "sister",
+    },
+    {
+      option: "grandfather",
+    },
+    {
+      option: "grandmother",
+    },
+    {
+      option: "grandson",
+    },
+    {
+      option: "granddaughter",
+    },
+  ];
+
   const createUserHandler = async (data: any) => {
     try {
-      const response: any = await API.post("/user/create", {
-        familyFirebaseId: user?.uid,
-        name: data?.name,
-        gender: data?.gender,
-        dateOfBirth: data?.dateOfBirth,
-      });
+      var formData = new FormData();
+      formData.append("familyFirebaseId", user?.uid);
+      formData.append("name", data?.name);
+      formData.append("gender", data?.gender);
+      formData.append("relation", data?.relation);
+      formData.append("dateOfBirth", data?.dateOfBirth);
+      formData?.append("image", fileObj);
+
+      const response: any = await API.post("/user/create", formData);
       if (response) {
         console.log(response);
         toast({
@@ -98,6 +156,20 @@ const Home: NextPage = () => {
     fetchFamilyInformation();
   }, []);
   console.log(family, "family");
+  const handleOnChange = async (e: any) => {
+    const url: any = URL.createObjectURL(e.target.files[0]);
+    setImageUrl(url);
+
+    setFileObj(e.target.files[0]);
+  };
+  const openHandler = () => {
+    onToggle();
+    setImageUrl(null);
+    reset({
+      keepValues: false,
+    });
+  };
+  console.log(errors, "errors>>><>");
   return (
     <Box>
       <Flex
@@ -105,8 +177,8 @@ const Home: NextPage = () => {
         align="start"
         justify={"center"}
         direction={"column"}
-        gap="10"
-        mt="4"
+        gap="8"
+        my="4"
         px="2"
       >
         <Heading
@@ -117,10 +189,47 @@ const Home: NextPage = () => {
         >
           Welcome {family?.name},
         </Heading>
+        <Box
+          background={"blue.50"}
+          py="6"
+          px="4"
+          width={{ base: "full", md: "md" }}
+          rounded="lg"
+          boxShadow={"sm"}
+        >
+          <Heading size={"lg"} mb="4">
+            Family Details
+          </Heading>
+          <VStack align={"stretch"} color="gray.700">
+            <HStack>
+              <Text fontWeight={"semibold"}>Email:</Text>
+              <Text>{family?.email}</Text>
+            </HStack>
+            <HStack>
+              <Text fontWeight={"semibold"}>Address:</Text>
+              <Text>{family?.address}</Text>
+            </HStack>
+            <HStack>
+              <Text fontWeight={"semibold"}>House Number:</Text>
+              <Text>{family?.houseNumber}</Text>
+            </HStack>
+            <HStack>
+              <Text fontWeight={"semibold"}>Phone Number:</Text>
+              <Text>{family?.phone}</Text>
+            </HStack>
+            <Divider />
+            <HStack>
+              <Text fontWeight={"semibold"}>Total family members:</Text>
+              <Tag colorScheme={"twitter"} rounded={"full"}>
+                {family?.users?.length}
+              </Tag>
+            </HStack>
+          </VStack>
+        </Box>
         <Button
-          onClick={onOpen}
+          onClick={() => openHandler()}
           shadow={"md"}
-          colorScheme={"green"}
+          colorScheme={"twitter"}
           size="lg"
           height={"80px"}
           p="10"
@@ -134,19 +243,41 @@ const Home: NextPage = () => {
       </Flex>
       <Modal
         size={{ md: "xl" }}
-        colorScheme={"green"}
+        colorScheme={"blue"}
         onClose={onClose}
         isOpen={isOpen}
         motionPreset="slideInBottom"
       >
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader color="green.500">Add family member</ModalHeader>
+          <ModalHeader color="blue.500">Add family member</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Box px="2" py="4" color="gray.800">
               <form onSubmit={handleSubmit(createUserHandler)}>
-                <VStack gap={"10px"}>
+                <VStack gap={"10px"} align={"stretch"}>
+                  <Box>
+                    {imageUrl && (
+                      <Center rounded={"full"}>
+                        <Avatar src={imageUrl} size={"2xl"} />
+                      </Center>
+                    )}
+
+                    <Controller
+                      name="image"
+                      control={control}
+                      render={({ field }) => (
+                        <FormControl>
+                          <FormLabel>Upload Image</FormLabel>
+                          <Input
+                            {...field}
+                            type="file"
+                            onChange={handleOnChange}
+                          />
+                        </FormControl>
+                      )}
+                    />
+                  </Box>
                   <InputController
                     name="name"
                     register={register}
@@ -177,11 +308,28 @@ const Home: NextPage = () => {
                       {errors?.gender?.message?.toString()}
                     </FormErrorMessage>
                   </FormControl>
+                  <FormControl isInvalid={!!errors?.relation?.message}>
+                    <FormLabel>Relation</FormLabel>
+
+                    <Select {...register("relation")} defaultValue="">
+                      <option disabled value="">
+                        select your relation...
+                      </option>
+                      {relationOptions.map((item, key) => (
+                        <option key={key} value={item.option}>
+                          {item.option}
+                        </option>
+                      ))}
+                    </Select>
+                    <FormErrorMessage>
+                      {errors?.relation?.message?.toString()}
+                    </FormErrorMessage>
+                  </FormControl>
                   <Button
                     isLoading={isSubmitting}
                     width={"full"}
                     leftIcon={<AddIcon />}
-                    colorScheme="green"
+                    colorScheme="twitter"
                     type="submit"
                   >
                     Add

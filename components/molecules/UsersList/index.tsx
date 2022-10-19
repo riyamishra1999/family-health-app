@@ -9,7 +9,7 @@ interface usersListProps {
 const UsersList = ({ users }: usersListProps) => {
   console.log(users, "uselisr");
   return (
-    <Box w="full">
+    <Box w={"full"}>
       <Heading color="gray.800" mb="10">
         Your Family Members
       </Heading>
@@ -19,8 +19,9 @@ const UsersList = ({ users }: usersListProps) => {
             <UserCard
               key={key}
               name={user?.name}
-              photo={user?.photo}
+              photo={user?.image}
               id={user?.userId}
+              relation={user?.relation}
             />
           ))}
       </SimpleGrid>
