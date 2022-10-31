@@ -43,6 +43,7 @@ import { AddIcon } from "@chakra-ui/icons";
 import axios from "axios";
 import { BearerToken } from "../../utils/icdToken";
 import { FiMessageSquare, FiShare } from "react-icons/fi";
+import { saveAs } from "file-saver";
 const UserPage = () => {
   const router = useRouter();
   const id = router.query.id;
@@ -197,12 +198,13 @@ const UserPage = () => {
     setReports(await response?.response);
     if (diagTags?.length > 0) {
       const finalResp = Promise.all(
-        diagTags?.map(async (item: string) => {
+        diagTags?.map(async (item: string, key: any) => {
           const myURL = await giveMeFoundationURL(item);
           const responseId: string = await myURL?.data?.destinationEntities[0]
             ?.id;
-          console.log(responseId, "poapsdkpaodjpi");
+          console.log(responseId, "url link");
           return {
+            key: key,
             name: item,
             url: "https://icd.who.int/dev11/f/en#/" + responseId,
           };
@@ -214,7 +216,27 @@ const UserPage = () => {
     }
   };
   console.log(tag, "diagResponse");
-
+  console.log(diag, reports, "download request>>>");
+  const downloadHandler = async (e: any, id: any) => {
+    console.log(id, "downloading");
+    e.preventDefault();
+    const resp: any = await API.post(
+      `/download/create-form/${id}`,
+      {
+        fetchUser,
+        diag,
+        reports,
+      },
+      {
+        responseType: "blob",
+      }
+    );
+    console.log(resp, "response");
+    if (resp) {
+      const pdfBlob = new Blob([resp], { type: "application/pdf" });
+      saveAs(pdfBlob, `${fetchUser?.name}-report.pdf`);
+    }
+  };
   return (
     <>
       {loading ? (
@@ -252,8 +274,8 @@ const UserPage = () => {
               onClick={openHandler}
             >
               <VStack>
-                <AddIcon boxSize={"16"} color={"gray.600"} />
-                <Text>Click here to add a report</Text>
+                <AddIcon boxSize={"20"} color={"gray.600"} />
+                <Text p="4">Click here to add a report</Text>
               </VStack>
             </Center>
             <Modal isOpen={isOpen} onClose={onClose} size={"2xl"}>
@@ -486,6 +508,7 @@ const UserPage = () => {
                       {tag?.length > 0 &&
                         tag?.map((item: any, key: any) => (
                           <LinkBox
+                            key={key}
                             as="article"
                             maxW="sm"
                             p="2"
@@ -519,7 +542,11 @@ const UserPage = () => {
                     <Button colorScheme={"gray"} leftIcon={<FiMessageSquare />}>
                       Send to mail
                     </Button>
-                    <Button colorScheme={"blue"} justifySelf={"end"}>
+                    <Button
+                      colorScheme={"blue"}
+                      justifySelf={"end"}
+                      onClick={(e) => downloadHandler(e, diag?.diagnosisId)}
+                    >
                       Download Report
                     </Button>
                   </Flex>
