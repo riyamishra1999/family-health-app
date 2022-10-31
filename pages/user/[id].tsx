@@ -274,8 +274,8 @@ const UserPage = () => {
               onClick={openHandler}
             >
               <VStack>
-                <AddIcon boxSize={"16"} color={"gray.600"} />
-                <Text>Click here to add a report</Text>
+                <AddIcon boxSize={"20"} color={"gray.600"} />
+                <Text p="4">Click here to add a report</Text>
               </VStack>
             </Center>
             <Modal isOpen={isOpen} onClose={onClose} size={"2xl"}>
