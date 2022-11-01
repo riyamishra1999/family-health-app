@@ -48,6 +48,7 @@ const UserPage = () => {
   const router = useRouter();
   const id = router.query.id;
   const [fetchUser, setFetchUser] = useState<any>();
+  const [selectedReports, setSelectedReports] = useState<any>();
   const FetchUser = async () => {
     const response: any = await API.get(`/user/${id}`);
     console.log(response, "rsss");
@@ -56,7 +57,7 @@ const UserPage = () => {
   const [diagnosis, setDiagnosis] = useState<any>();
   const FetchData = async () => {
     try {
-      const response: any = await API.get(`diagnosis/get/${id}`);
+      const response: any = await API.get(`/diagnosis/get/${id}`);
       setDiagnosis(response?.response);
     } catch (error) {
       console.log(error);
@@ -78,6 +79,7 @@ const UserPage = () => {
     mode: "all",
   });
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
+  const [showMultipleReports, setShowMultipleReports] = useState(false);
   const [tags, setTags] = useState<any>();
   const [loading, setLoading] = useState(false);
   const openHandler = () => {
@@ -236,6 +238,31 @@ const UserPage = () => {
       const pdfBlob = new Blob([resp], { type: "application/pdf" });
       saveAs(pdfBlob, `${fetchUser?.name}-report.pdf`);
     }
+  };
+  const downloadMultipleReports = async () => {
+    console.log(selectedReports);
+    if (selectedReports?.length > 0) {
+      var obj = [];
+      for (var i = 0; i < selectedReports.length; i++) {
+        const diagresp: any = await API.get(
+          `/diagnosis/one/${selectedReports[i]}`
+        );
+        console.log(diagresp, "diagresponse>>>");
+        const reportresp: any = await API.get(
+          `/report/get/${selectedReports[i]}`
+        );
+        const finaldiag = await diagresp?.response;
+        const finalreport = await reportresp?.response;
+        var final = { ...finaldiag, ...finalreport };
+        obj.push(final);
+      }
+      console.log(obj, "final object");
+    }
+  };
+  const multipleReportsHandler = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    console.log("downloading");
+    setShowMultipleReports(!showMultipleReports);
   };
   return (
     <>
@@ -429,6 +456,18 @@ const UserPage = () => {
               Report Timeline
             </Heading>
             <Divider />
+            <Flex>
+              <Button
+                my="2"
+                size="sm"
+                variant={"ghost"}
+                colorScheme="blue"
+                ml="auto"
+                onClick={(e) => multipleReportsHandler(e)}
+              >
+                Click here to download multiple reports
+              </Button>
+            </Flex>
             <SimpleGrid
               columns={[1, null, 3]}
               minChildWidth={"400px"}
@@ -448,7 +487,12 @@ const UserPage = () => {
                   position={"relative"}
                 >
                   <VStack align="stretch" p="2" spacing="4">
-                    <Heading color={"gray.600"} fontSize={"2xl"} pl={"4"}>
+                    <Heading
+                      color={"gray.600"}
+                      fontSize={"2xl"}
+                      pl={"4"}
+                      pt="2"
+                    >
                       {item?.date}
                     </Heading>
                     <Divider />
@@ -550,6 +594,41 @@ const UserPage = () => {
                       Download Report
                     </Button>
                   </Flex>
+                </ModalFooter>
+              </ModalContent>
+            </Modal>
+            <Modal
+              size="6xl"
+              motionPreset="slideInBottom"
+              isOpen={showMultipleReports}
+              onClose={() => setShowMultipleReports(false)}
+            >
+              <ModalOverlay />
+              <ModalContent>
+                <ModalHeader fontWeight={"bold"}>
+                  Please Select the Reports:
+                </ModalHeader>
+                <ModalCloseButton />
+                <ModalBody px="4" py="2">
+                  <CheckboxGroup
+                    onChange={(data: any) => setSelectedReports(data)}
+                  >
+                    <VStack align="stretch">
+                      {diagnosis?.map((item: any, key: any) => (
+                        <Checkbox key={key} value={item?.diagnosisId} size="lg">
+                          <Text>Diagnosis on {item?.date}</Text>
+                        </Checkbox>
+                      ))}
+                    </VStack>
+                  </CheckboxGroup>
+                </ModalBody>
+                <ModalFooter>
+                  <Button
+                    colorScheme={"blue"}
+                    onClick={downloadMultipleReports}
+                  >
+                    Download Reports
+                  </Button>
                 </ModalFooter>
               </ModalContent>
             </Modal>

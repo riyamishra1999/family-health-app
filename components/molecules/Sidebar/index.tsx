@@ -2,7 +2,7 @@ import { Flex } from "@chakra-ui/react";
 
 import React from "react";
 import { IconType } from "react-icons";
-import { FiHome } from "react-icons/fi";
+import { FiDownload, FiHome, FiStar } from "react-icons/fi";
 import NavItem from "../NavItem";
 interface LinkItemProps {
   name: string;
@@ -12,7 +12,7 @@ interface LinkItemProps {
 const LinkItems: Array<LinkItemProps> = [
   { name: "Dashboard", link: "/", icon: FiHome },
   // { name: "", icon: FiCompass },
-  // { name: "Favourites", icon: FiStar },
+  { name: "Download Reports", link: "/download-reports", icon: FiDownload },
   // { name: "Settings", icon: FiSettings },
 ];
 const Sidebar = () => {
