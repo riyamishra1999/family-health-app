@@ -29,6 +29,11 @@ import {
   useToast,
   VStack,
 } from "@chakra-ui/react";
+import {
+  VerticalTimeline,
+  VerticalTimelineElement,
+} from "react-vertical-timeline-component";
+import "react-vertical-timeline-component/style.min.css";
 import withPrivateRoute from "../../withPrivateRoute";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
@@ -42,19 +47,28 @@ import {
 import { AddIcon } from "@chakra-ui/icons";
 import axios from "axios";
 import { BearerToken } from "../../utils/icdToken";
-import { FiMessageSquare, FiShare } from "react-icons/fi";
+import { FiBook, FiBookOpen, FiMessageSquare, FiShare } from "react-icons/fi";
 import { saveAs } from "file-saver";
+import moment from "moment";
 const UserPage = () => {
   const router = useRouter();
   const id = router.query.id;
   const [fetchUser, setFetchUser] = useState<any>();
   const [selectedReports, setSelectedReports] = useState<any>();
+  const [sortDisease, setSortDisease] = useState<any>();
+  const [fromDate, setFromDate] = useState<any>(
+    new Date().toISOString().split("T")[0]
+  );
+  const [ToDate, setToDate] = useState<any>(
+    new Date().toISOString().split("T")[0]
+  );
+
   const FetchUser = async () => {
     const response: any = await API.get(`/user/${id}`);
     console.log(response, "rsss");
     setFetchUser(response?.data);
   };
-  const [diagnosis, setDiagnosis] = useState<any>();
+  const [diagnosis, setDiagnosis] = useState<any>([]);
   const FetchData = async () => {
     try {
       const response: any = await API.get(`/diagnosis/get/${id}`);
@@ -63,7 +77,7 @@ const UserPage = () => {
       console.log(error);
     }
   };
-  console.log(diagnosis, "diag");
+  console.log(diagnosis, "diagnosis response>>>>>>");
   useEffect(() => {
     FetchUser();
     FetchData();
@@ -152,23 +166,51 @@ const UserPage = () => {
   const [searchText, setSearchText] = useState<string>("");
   const [dataICD, setDataICD] = useState<any>();
 
-  const queryICD = async () => {
-    const response: any = await axios.get(
-      `https://id.who.int/icd/entity/search?q=${searchText}&useFlexisearch=false&flatResults=true&highlightingEnabled=false`,
-      {
-        headers: {
-          Accept: "application/json",
-          "API-Version": "v2",
-          "Accept-Language": "en",
-          Authorization: BearerToken,
-        },
-      }
-    );
-    console.log(response);
-    if (!response?.error) {
-      setDataICD(response?.data?.destinationEntities);
-    }
+  const queryICD = async (e: any) => {
+    setSearchText(e.target.value);
+
+    // const response: any = await axios.get(
+    //   `https://id.who.int/icd/entity/search?q=${searchText}&useFlexisearch=false&flatResults=true&highlightingEnabled=false`,
+    //   {
+    //     headers: {
+    //       Accept: "application/json",
+    //       "API-Version": "v2",
+    //       "Accept-Language": "en",
+    //       Authorization: BearerToken,
+    //     },
+    //   }
+    // );
+    // console.log(response);
+    // if (!response?.error) {
+    //   setDataICD(response?.data?.destinationEntities);
+    // }
   };
+  useEffect(() => {
+    if (searchText != "") {
+      const delayDebounceFn = setTimeout(async () => {
+        // console.log(searchText);
+        // Send Axios request here
+        const response: any = await axios.get(
+          `https://id.who.int/icd/entity/search?q=${searchText}&useFlexisearch=false&flatResults=true&highlightingEnabled=false`,
+          {
+            headers: {
+              Accept: "application/json",
+              "API-Version": "v2",
+              "Accept-Language": "en",
+              Authorization: BearerToken,
+            },
+          }
+        );
+        console.log(response);
+        if (!response?.error) {
+          setDataICD(response?.data?.destinationEntities);
+        }
+      }, 3000);
+
+      return () => clearTimeout(delayDebounceFn);
+    }
+  }, [searchText]);
+
   const [showReports, setShowReports] = useState(false);
   console.log(dataICD);
   const [reports, setReports] = useState<any>();
@@ -263,6 +305,19 @@ const UserPage = () => {
     e.preventDefault();
     console.log("downloading");
     setShowMultipleReports(!showMultipleReports);
+  };
+  console.log(moment(fromDate).unix(), ToDate, "dates sort>>>>");
+
+  const sortReportHandler = async () => {
+    setDiagnosis([]);
+    try {
+      const response: any = await API.get(
+        `/diagnosis/sort/${id}?fromDate=${fromDate}&toDate=${ToDate}&sortDisease=${sortDisease}`
+      );
+      setDiagnosis(response?.response);
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <>
@@ -374,17 +429,17 @@ const UserPage = () => {
                             <HStack>
                               <Input
                                 size={"lg"}
-                                placeholder="search for related diseases..."
+                                placeholder="search for related diseases...(press space for multiple options)"
                                 type="text"
                                 value={searchText}
-                                onChange={(e) => setSearchText(e.target.value)}
+                                onChange={(e) => queryICD(e)}
                               />
-                              <Button
+                              {/* <Button
                                 colorScheme={"twitter"}
                                 onClick={queryICD}
                               >
                                 Search
-                              </Button>
+                              </Button> */}
                             </HStack>
                             {dataICD?.length > 0 && (
                               <VStack
@@ -456,19 +511,144 @@ const UserPage = () => {
               Report Timeline
             </Heading>
             <Divider />
-            <Flex>
-              <Button
-                my="2"
-                size="sm"
-                variant={"ghost"}
-                colorScheme="blue"
-                ml="auto"
-                onClick={(e) => multipleReportsHandler(e)}
-              >
-                Click here to download multiple reports
-              </Button>
+            <Flex
+              align={"center"}
+              justify="flex-end"
+              gap="2"
+              color="gray.600"
+              bg="gray.50"
+              p="2"
+            >
+              <Text fontWeight={"semibold"} size="sm">
+                sort reports
+              </Text>
+              <Divider orientation="vertical" />
+              <Stack direction={{ base: "column", md: "row" }}>
+                <HStack>
+                  <Input
+                    size="sm"
+                    type="text"
+                    value={sortDisease}
+                    placeholder="search by disease"
+                    onChange={(e) => setSortDisease(e.target.value)}
+                  />
+                </HStack>
+                <HStack>
+                  <Text>from:</Text>
+                  <Input
+                    size="sm"
+                    type="date"
+                    value={fromDate}
+                    onChange={(e) => setFromDate(e.target.value)}
+                  />
+                </HStack>
+                <HStack>
+                  <Text>To:</Text>
+                  <Input
+                    size="sm"
+                    type="date"
+                    value={ToDate}
+                    onChange={(e) => setToDate(e.target.value)}
+                  />
+                </HStack>
+                <Button
+                  size="sm"
+                  colorScheme={"yellow"}
+                  onClick={() => sortReportHandler()}
+                >
+                  sort
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  colorScheme={"red"}
+                  onClick={() => FetchData()}
+                >
+                  clear filter
+                </Button>
+              </Stack>
             </Flex>
-            <SimpleGrid
+            <Box w="full" background={"gray.50"} p="2">
+              {diagnosis?.length > 0 ? (
+                <VerticalTimeline lineColor={"SkyBlue"}>
+                  {diagnosis?.map((item: any, key: any) => (
+                    <VerticalTimelineElement
+                      className="vertical-timeline-element--education"
+                      date={item?.date}
+                      iconStyle={{
+                        background: "SkyBlue",
+                        color: "#fff",
+                      }}
+                      icon={<FiBookOpen />}
+                      key={`diag-${key}`}
+                    >
+                      <Box
+                        background={"blue.50"}
+                        borderWidth={"2px"}
+                        borderColor={"blue.100"}
+                        rounded={"md"}
+                        position={"relative"}
+                        onClick={(e) =>
+                          showReportsHandler(item?.diagnosisId, e)
+                        }
+                        _hover={{
+                          cursor: "pointer",
+                          boxShadow: "lg",
+                          transitionDuration: "500ms",
+                        }}
+                      >
+                        <Box p="2">
+                          <VStack>
+                            <Text
+                              fontSize={"lg"}
+                              fontWeight="semibold"
+                              color={"gray.600"}
+                            >
+                              Diagnosed with:
+                            </Text>
+                            <Text fontFamily={"mono"} p="4">
+                              {item?.tags}
+                            </Text>
+                            <Divider />
+                            <Text
+                              fontSize={"lg"}
+                              fontWeight="semibold"
+                              color={"gray.600"}
+                            >
+                              Remarks:
+                            </Text>
+                            <Text fontFamily={"mono"} p="4">
+                              {item?.remarks}
+                            </Text>
+                            <Divider />
+                            <Text
+                              fontSize={"lg"}
+                              fontWeight="semibold"
+                              color={"gray.600"}
+                            >
+                              Follow Up:
+                            </Text>
+                            <Text fontFamily={"mono"} p="4">
+                              {item?.followupDate}
+                            </Text>
+                          </VStack>
+                        </Box>
+                      </Box>
+                    </VerticalTimelineElement>
+                  ))}
+                </VerticalTimeline>
+              ) : (
+                <Heading
+                  textAlign={"center"}
+                  p="4"
+                  fontSize={"xl"}
+                  color="gray.600"
+                >
+                  No records found
+                </Heading>
+              )}
+            </Box>
+            {/* <SimpleGrid
               columns={[1, null, 3]}
               minChildWidth={"400px"}
               spacing={"8"}
@@ -522,7 +702,7 @@ const UserPage = () => {
                   </VStack>
                 </Box>
               ))}
-            </SimpleGrid>
+            </SimpleGrid> */}
             <Modal
               size="6xl"
               motionPreset="slideInBottom"

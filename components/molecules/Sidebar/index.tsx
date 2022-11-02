@@ -12,7 +12,7 @@ interface LinkItemProps {
 const LinkItems: Array<LinkItemProps> = [
   { name: "Dashboard", link: "/", icon: FiHome },
   // { name: "", icon: FiCompass },
-  { name: "Download Reports", link: "/download-reports", icon: FiDownload },
+  // { name: "Download Reports", link: "/download-reports", icon: FiDownload },
   // { name: "Settings", icon: FiSettings },
 ];
 const Sidebar = () => {
