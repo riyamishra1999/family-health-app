@@ -8,6 +8,7 @@ import {
   Divider,
   Flex,
   FormControl,
+  FormHelperText,
   FormLabel,
   Heading,
   HStack,
@@ -293,10 +294,31 @@ const UserPage = () => {
         const reportresp: any = await API.get(
           `/report/get/${selectedReports[i]}`
         );
+        console.log(reportresp, "reportresp>>>");
         const finaldiag = await diagresp?.response;
-        const finalreport = await reportresp?.response;
+        const finalreport = await reportresp;
         var final = { ...finaldiag, ...finalreport };
         obj.push(final);
+      }
+      console.log(obj, "obj>>>>");
+      try {
+        const resp: any = await API.post(
+          `/download/create-multiple-form/${fetchUser?.userId}`,
+          {
+            fetchUser,
+            obj,
+          },
+          {
+            responseType: "blob",
+          }
+        );
+        console.log(resp, "multiple resp>>>>");
+        if (resp) {
+          const pdfBlob = new Blob([resp], { type: "application/pdf" });
+          saveAs(pdfBlob, `${fetchUser?.name}-multiple-report.pdf`);
+        }
+      } catch (error) {
+        console.log(error);
       }
       console.log(obj, "final object");
     }
@@ -387,7 +409,15 @@ const UserPage = () => {
                           />
                         </FormControl>
                         <VStack align="stretch" spacing={"-1"}>
-                          <FormLabel>Upload Prescription Image</FormLabel>
+                          <FormLabel>Upload Images</FormLabel>
+                          <Text
+                            size="xs"
+                            color="gray.600"
+                            pb="2"
+                            fontWeight={"semibold"}
+                          >
+                            including lab reports, xray, appointments (if exist)
+                          </Text>
                           <Controller
                             name="images"
                             control={control}
@@ -511,6 +541,16 @@ const UserPage = () => {
               Report Timeline
             </Heading>
             <Divider />
+            <Flex align="center" justify={"flex-end"} py="2">
+              <Button
+                size="sm"
+                variant="outline"
+                colorScheme={"green"}
+                onClick={(e) => multipleReportsHandler(e)}
+              >
+                download multiple reports
+              </Button>
+            </Flex>
             <Flex
               align={"center"}
               justify="flex-end"
@@ -519,11 +559,10 @@ const UserPage = () => {
               bg="gray.50"
               p="2"
             >
-              <Text fontWeight={"semibold"} size="sm">
-                sort reports
-              </Text>
-              <Divider orientation="vertical" />
-              <Stack direction={{ base: "column", md: "row" }}>
+              <Stack direction={{ base: "column", md: "row" }} align="center">
+                <Text fontWeight={"semibold"} size="sm">
+                  sort reports
+                </Text>
                 <HStack>
                   <Input
                     size="sm"
@@ -562,7 +601,10 @@ const UserPage = () => {
                   size="sm"
                   variant="ghost"
                   colorScheme={"red"}
-                  onClick={() => FetchData()}
+                  onClick={() => {
+                    FetchData();
+                    setSortDisease("");
+                  }}
                 >
                   clear filter
                 </Button>
