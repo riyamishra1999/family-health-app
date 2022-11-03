@@ -12,6 +12,7 @@ import {
   FormLabel,
   Heading,
   HStack,
+  Icon,
   Input,
   LinkBox,
   LinkOverlay,
@@ -48,7 +49,14 @@ import {
 import { AddIcon } from "@chakra-ui/icons";
 import axios from "axios";
 import { BearerToken } from "../../utils/icdToken";
-import { FiBook, FiBookOpen, FiMessageSquare, FiShare } from "react-icons/fi";
+import {
+  FiBluetooth,
+  FiBook,
+  FiBookOpen,
+  FiEye,
+  FiMessageSquare,
+  FiShare,
+} from "react-icons/fi";
 import { saveAs } from "file-saver";
 import moment from "moment";
 const UserPage = () => {
@@ -368,7 +376,7 @@ const UserPage = () => {
               borderStyle={"dashed"}
               borderColor={"gray.500"}
               height={"200px"}
-              width={{ base: "full", md: "200px" }}
+              width={{ base: "full", md: "300px" }}
               cursor="pointer"
               _hover={{
                 boxShadow: "xl",
@@ -377,7 +385,7 @@ const UserPage = () => {
               }}
               onClick={openHandler}
             >
-              <VStack>
+              <VStack pt="4">
                 <AddIcon boxSize={"20"} color={"gray.600"} />
                 <Text p="4">Click here to add a report</Text>
               </VStack>
@@ -537,9 +545,11 @@ const UserPage = () => {
           </SimpleGrid>
           <Divider my="10" />
           <Box>
-            <Heading mb="4" color={"gray.800"}>
-              Report Timeline
-            </Heading>
+            <Box borderLeft="10px solid SkyBlue">
+              <Heading ml="2" mb="4" color={"gray.800"}>
+                Report Timeline
+              </Heading>
+            </Box>
             <Divider />
             <Flex align="center" justify={"flex-end"} py="2">
               <Button
@@ -770,29 +780,31 @@ const UserPage = () => {
                     ))}
                   <HStack>
                     <Text fontWeight={"semibold"}>Diagnosed with:</Text>
-                    <Stack direction={["column", "row"]} spacing="24px">
-                      {tag?.length > 0 &&
-                        tag?.map((item: any, key: any) => (
-                          <LinkBox
-                            key={key}
-                            as="article"
-                            maxW="sm"
-                            p="2"
-                            borderWidth="1px"
-                            rounded="md"
-                            _hover={{
-                              boxShadow: "sm",
-                              textDecoration: "underline",
-                            }}
-                          >
-                            <Heading size="sm" my="2">
-                              <LinkOverlay href={item?.url} target={"_blank"}>
-                                {item?.name}
-                              </LinkOverlay>
-                            </Heading>
-                          </LinkBox>
-                        ))}
-                    </Stack>
+                    <Box flexWrap={"wrap"}>
+                      <Stack direction={["column", "row"]} spacing="24px">
+                        {tag?.length > 0 &&
+                          tag?.map((item: any, key: any) => (
+                            <LinkBox
+                              key={key}
+                              as="article"
+                              maxW="sm"
+                              p="2"
+                              borderWidth="1px"
+                              rounded="md"
+                              _hover={{
+                                boxShadow: "sm",
+                                textDecoration: "underline",
+                              }}
+                            >
+                              <Heading size="sm" my="2">
+                                <LinkOverlay href={item?.url} target={"_blank"}>
+                                  {item?.name}
+                                </LinkOverlay>
+                              </Heading>
+                            </LinkBox>
+                          ))}
+                      </Stack>
+                    </Box>
                   </HStack>
                   <HStack py="2">
                     <Text fontWeight={"semibold"}>Follow up Date:</Text>
@@ -805,9 +817,9 @@ const UserPage = () => {
                 </ModalBody>
                 <ModalFooter>
                   <Flex justify={"flex-end"} gap={"2"}>
-                    <Button colorScheme={"gray"} leftIcon={<FiMessageSquare />}>
+                    {/* <Button colorScheme={"gray"} leftIcon={<FiMessageSquare />}>
                       Send to mail
-                    </Button>
+                    </Button> */}
                     <Button
                       colorScheme={"blue"}
                       justifySelf={"end"}
@@ -828,7 +840,7 @@ const UserPage = () => {
               <ModalOverlay />
               <ModalContent>
                 <ModalHeader fontWeight={"bold"}>
-                  Please Select the Reports:
+                  Please select the reports to download:
                 </ModalHeader>
                 <ModalCloseButton />
                 <ModalBody px="4" py="2">
@@ -837,15 +849,42 @@ const UserPage = () => {
                   >
                     <VStack align="stretch">
                       {diagnosis?.map((item: any, key: any) => (
-                        <Checkbox key={key} value={item?.diagnosisId} size="lg">
-                          <Text>Diagnosis on {item?.date}</Text>
-                        </Checkbox>
+                        <Flex
+                          width="full"
+                          key={key}
+                          rounded="md"
+                          _hover={{
+                            bg: "blue.50",
+                          }}
+                          p="2"
+                          align="center"
+                          justify={"space-between"}
+                        >
+                          <Checkbox value={item?.diagnosisId} size="lg" p="2">
+                            <VStack align="stretch" px="2">
+                              <Text>Diagnosis on {item?.date}</Text>
+                              <Text>{item?.tags}</Text>
+                            </VStack>
+                          </Checkbox>
+                          <Button
+                            variant={"outline"}
+                            rounded="md"
+                            colorScheme={"yellow"}
+                            leftIcon={<FiEye />}
+                            onClick={(e) =>
+                              showReportsHandler(item?.diagnosisId, e)
+                            }
+                          >
+                            view
+                          </Button>
+                        </Flex>
                       ))}
                     </VStack>
                   </CheckboxGroup>
                 </ModalBody>
                 <ModalFooter>
                   <Button
+                    size="lg"
                     colorScheme={"blue"}
                     onClick={downloadMultipleReports}
                   >

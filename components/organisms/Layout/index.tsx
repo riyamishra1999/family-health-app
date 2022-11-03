@@ -15,11 +15,11 @@ const Layout = ({ children, user }: LayoutProps) => {
       {user && <Header />}
 
       <HStack w={"full"} align={"stretch"}>
-        {user && (
+        {/* {user && (
           <Flex w={"sm"} display={{ base: "none", lg: "flex" }}>
             <SideBar />
           </Flex>
-        )}
+        )} */}
 
         <div style={{ width: "100%", padding: "0 8px 0 8px" }}>{children}</div>
       </HStack>
