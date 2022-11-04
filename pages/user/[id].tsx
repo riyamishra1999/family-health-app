@@ -214,7 +214,7 @@ const UserPage = () => {
         if (!response?.error) {
           setDataICD(response?.data?.destinationEntities);
         }
-      }, 3000);
+      }, 2000);
 
       return () => clearTimeout(delayDebounceFn);
     }
@@ -658,7 +658,11 @@ const UserPage = () => {
                             >
                               Diagnosed with:
                             </Text>
-                            <Text fontFamily={"mono"} p="4">
+                            <Text
+                              fontFamily={"mono"}
+                              p="4"
+                              wordBreak={"break-all"}
+                            >
                               {item?.tags}
                             </Text>
                             <Divider />
@@ -778,10 +782,10 @@ const UserPage = () => {
                         />
                       </Box>
                     ))}
-                  <HStack>
+                  <VStack align={"stretch"} mt="2">
                     <Text fontWeight={"semibold"}>Diagnosed with:</Text>
-                    <Box flexWrap={"wrap"}>
-                      <Stack direction={["column", "row"]} spacing="24px">
+                    <Box>
+                      <Flex direction={["column", "row"]} flexWrap={"wrap"}>
                         {tag?.length > 0 &&
                           tag?.map((item: any, key: any) => (
                             <LinkBox
@@ -789,23 +793,23 @@ const UserPage = () => {
                               as="article"
                               maxW="sm"
                               p="2"
-                              borderWidth="1px"
                               rounded="md"
                               _hover={{
+                                background: "gray.50",
                                 boxShadow: "sm",
                                 textDecoration: "underline",
                               }}
                             >
-                              <Heading size="sm" my="2">
+                              <Text size="sm">
                                 <LinkOverlay href={item?.url} target={"_blank"}>
                                   {item?.name}
                                 </LinkOverlay>
-                              </Heading>
+                              </Text>
                             </LinkBox>
                           ))}
-                      </Stack>
+                      </Flex>
                     </Box>
-                  </HStack>
+                  </VStack>
                   <HStack py="2">
                     <Text fontWeight={"semibold"}>Follow up Date:</Text>
                     <Text>{diag?.followupDate}</Text>
